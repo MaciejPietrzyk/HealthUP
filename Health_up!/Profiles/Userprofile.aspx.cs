@@ -44,8 +44,9 @@ namespace Health_up_
                             WHEN u.CityID IS NULL OR u.CityID = 81 THEN 'Nie podano' 
                             ELSE c.CityName 
                         END AS CityName,
-                        u.DailyCalories
+                        uh.CaloricNeeds
                     FROM Users u
+                    LEFT JOIN UserHealthData uh ON u.UserID = uh.UserID
                     LEFT JOIN Regions r ON u.RegionID = r.RegionID
                     LEFT JOIN Cities c ON u.CityID = c.CityID
                     WHERE u.UserID = @UserID";
@@ -64,10 +65,10 @@ namespace Health_up_
                         lblRegion.Text = dr["RegionName"].ToString();
                         lblCity.Text = dr["CityName"].ToString();
 
-                        if (dr["DailyCalories"] != DBNull.Value)
+                        if (dr["CaloricNeeds"] != DBNull.Value)
                         {
                             lblCalories.Text = "Twoje dzienne zapotrzebowanie: "
-                                             + dr["DailyCalories"].ToString() + " kcal";
+                                             + dr["CaloricNeeds"].ToString() + " kcal";
                         }
                         else
                         {

@@ -52,6 +52,13 @@
 
                     <div class="text-center mt-3">
                         <asp:Button ID="btnCalculateCalories" runat="server" Text="Oblicz zapotrzebowanie" CssClass="btn btn-success" OnClick="btnCalculateCalories_Click" Visible="false" />
+                        <div class="text-center mt-3">
+                    <asp:HyperLink ID="lnkCaloriesChart" runat="server" 
+                         CssClass="btn btn-info" 
+                         NavigateUrl="~/Features/CaloriesChart.aspx">
+                               Wykres zapotrzebowania kalorycznego
+                         </asp:HyperLink>
+</div>
                     </div>
                 </div>
             </div>

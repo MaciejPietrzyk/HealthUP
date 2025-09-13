@@ -2185,7 +2185,9 @@
     <Content Include="Features\AddMeal.aspx" />
     <Content Include="Features\Calculator.aspx" />
     <Content Include="Account\Register.aspx" />
+    <Content Include="Features\CaloriesChart.aspx" />
     <Content Include="Features\Meals.aspx" />
+    <Content Include="Features\MealsSummary.aspx" />
     <Content Include="Features\Products.aspx" />
     <Content Include="Global.asax" />
     <Content Include="Web.config" />
@@ -2214,12 +2216,26 @@
     <Compile Include="Features\Calculator.aspx.designer.cs">
       <DependentUpon>Calculator.aspx</DependentUpon>
     </Compile>
+    <Compile Include="Features\CaloriesChart.aspx.cs">
+      <DependentUpon>CaloriesChart.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Features\CaloriesChart.aspx.designer.cs">
+      <DependentUpon>CaloriesChart.aspx</DependentUpon>
+    </Compile>
     <Compile Include="Features\Meals.aspx.cs">
       <DependentUpon>Meals.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Features\Meals.aspx.designer.cs">
       <DependentUpon>Meals.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Features\MealsSummary.aspx.cs">
+      <DependentUpon>MealsSummary.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Features\MealsSummary.aspx.designer.cs">
+      <DependentUpon>MealsSummary.aspx</DependentUpon>
     </Compile>
     <Compile Include="Features\Products.aspx.cs">
       <DependentUpon>Products.aspx</DependentUpon>
