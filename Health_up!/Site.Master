@@ -1,0 +1,125 @@
+﻿<%@ Master Language="C#" AutoEventWireup="true" CodeBehind="Site.master.cs" Inherits="Health_up_.Site" %>
+
+<!DOCTYPE html>
+<html>
+<head runat="server">
+    <title>Health Up</title>
+
+    <!-- Style -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet" />
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet" />
+    <link rel="icon" href="Assets/images/icon2.png" type="x-icon" />
+
+    <asp:ContentPlaceHolder ID="head" runat="server"></asp:ContentPlaceHolder>
+</head>
+
+<body style="margin:0; font-family:'Poppins', sans-serif;">
+
+<form id="form1" runat="server">
+
+    <!-- HEADER -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <!-- Logo -->
+            <asp:HyperLink ID="lnkLogo" runat="server" CssClass="navbar-brand d-flex align-items-center" NavigateUrl="~/Home.aspx">
+                <img src="/Assets/images/icon.png" alt="Health Up Logo" width="40" height="40" class="mr-2" />
+                Health Up!
+            </asp:HyperLink>
+
+            <!-- Hamburger -->
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarContent"
+                    aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <!-- Menu -->
+            <div class="collapse navbar-collapse" id="navbarContent">
+                <ul class="navbar-nav ml-auto align-items-center">
+                    <li class="nav-item">
+                        <asp:HyperLink ID="lnkHome" runat="server" CssClass="nav-link" NavigateUrl="~/Home.aspx">Home</asp:HyperLink>
+                    </li>
+                    <li class="nav-item">
+                        <asp:HyperLink ID="lnkAbout" runat="server" CssClass="nav-link" NavigateUrl="~/Features/About.aspx">About</asp:HyperLink>
+                    </li>
+                    <li class="nav-item">
+                        <asp:HyperLink ID="lnkContact" runat="server" CssClass="nav-link" NavigateUrl="~/Features/Contact.aspx">Contact</asp:HyperLink>
+                    </li>
+                    <li class="nav-item">
+                        <asp:HyperLink ID="lnkCalc" runat="server" CssClass="nav-link" NavigateUrl="~/Features/Calculator.aspx">Kalkulator</asp:HyperLink>
+                    </li>
+
+                    <% if (Session["IsAdmin"] != null && (bool)Session["IsAdmin"]) { %>
+                        <!-- Menu dla admina -->
+                        <li class="nav-item">
+                            <asp:HyperLink ID="lnkAdminPanel" runat="server" CssClass="nav-link" NavigateUrl="~/Admin/AdminPanel.aspx">Panel Admina</asp:HyperLink>
+                        </li>
+                        <li class="nav-item">
+                            <asp:HyperLink ID="lnkProducts" runat="server" CssClass="nav-link" NavigateUrl="~/Features/Products.aspx">Produkty</asp:HyperLink>
+                        </li>
+                        <li class="nav-item">
+                            <asp:HyperLink ID="lnkLogoutAdmin" runat="server" CssClass="nav-link" NavigateUrl="~/Account/Logout.aspx">Wyloguj</asp:HyperLink>
+                        </li>
+                        <span class="navbar-text text-white ml-3">
+                            Zalogowany jako: Administrator
+                        </span>
+                    <% } else if (Session["UserID"] != null) { %>
+                        <!-- Menu dla użytkownika -->
+                        <li class="nav-item">
+                            <asp:HyperLink ID="lnkProfile" runat="server" CssClass="nav-link" NavigateUrl="~/Profiles/UserProfile.aspx">Profil</asp:HyperLink>
+                        </li>
+                        <li class="nav-item">
+                            <asp:HyperLink ID="lnkMeals" runat="server" CssClass="nav-link" NavigateUrl="~/Features/Meals.aspx">Posiłki</asp:HyperLink>
+                        </li>
+                        <li class="nav-item">
+                            <asp:HyperLink ID="lnkLogout" runat="server" CssClass="nav-link" NavigateUrl="~/Account/Logout.aspx">Wyloguj</asp:HyperLink>
+                        </li>
+                        <span class="navbar-text text-white ml-3">
+                            Zalogowany jako: <%: Session["Username"] %>
+                        </span>
+                    <% } else { %>
+                        <!-- Menu dla gościa -->
+                        <li class="nav-item">
+                            <asp:HyperLink ID="lnkLogin" runat="server" CssClass="nav-link" NavigateUrl="~/Account/Login.aspx">Login</asp:HyperLink>
+                        </li>
+                        <li class="nav-item">
+                            <asp:HyperLink ID="lnkRegister" runat="server" CssClass="nav-link" NavigateUrl="~/Account/Register.aspx">Register</asp:HyperLink>
+                        </li>
+                    <% } %>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- MAIN -->
+    <main class="container mt-4">
+        <asp:ContentPlaceHolder ID="MainContent" runat="server"></asp:ContentPlaceHolder>
+    </main>
+
+</form>
+
+    <!-- FOOTER -->
+    <footer class="bg-dark text-white py-3 mt-5">
+        <div class="container text-center">
+            <p>&copy; 2025 Health Up! | All rights reserved.</p>
+            <p>
+                <a href="https://www.facebook.com" target="_blank" class="text-white mr-3"><i class="fab fa-facebook-f"></i></a>
+                <a href="https://twitter.com" target="_blank" class="text-white mr-3"><i class="fab fa-twitter"></i></a>
+                <a href="https://www.instagram.com" target="_blank" class="text-white"><i class="fab fa-instagram"></i></a>
+            </p>
+
+            <!-- Niewidzialny przycisk admina -->
+            <asp:HyperLink ID="hiddenAdminLogin" runat="server" NavigateUrl="~/Admin/AdminLogin.aspx"
+                style="position:absolute; right:10px; bottom:10px; width:40px; height:40px;
+                       background:transparent; color:transparent; border:none; cursor:pointer;">
+                .
+            </asp:HyperLink>
+        </div>
+    </footer>
+
+    <!-- Skrypty -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>
