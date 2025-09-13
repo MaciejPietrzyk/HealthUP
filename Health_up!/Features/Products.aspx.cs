@@ -28,7 +28,7 @@ namespace Health_up_.Features
         {
             using (SqlConnection con = new SqlConnection(strcon))
             {
-                SqlDataAdapter da = new SqlDataAdapter("SELECT ProductID, ProductName, CaloriesPer100g FROM Products", con);
+                SqlDataAdapter da = new SqlDataAdapter("SELECT ProductID, ProductName, CaloriesPer100g, ProteinPer100g, CarbsPer100g, FatPer100g FROM Products", con);
                 DataTable dt = new DataTable();
                 da.Fill(dt);
                 gvProducts.DataSource = dt;
@@ -42,9 +42,16 @@ namespace Health_up_.Features
             {
                 using (SqlConnection con = new SqlConnection(strcon))
                 {
-                    SqlCommand cmd = new SqlCommand("INSERT INTO Products (ProductName, CaloriesPer100g) VALUES (@Name, @Calories)", con);
+                    SqlCommand cmd = new SqlCommand(@"
+                INSERT INTO Products (ProductName, CaloriesPer100g, ProteinPer100g, CarbsPer100g, FatPer100g) 
+                VALUES (@Name, @Calories, @Protein, @Carbs, @Fat)", con);
+
                     cmd.Parameters.AddWithValue("@Name", txtProductName.Text.Trim());
-                    cmd.Parameters.AddWithValue("@Calories", Convert.ToInt32(txtCalories.Text.Trim()));
+                    cmd.Parameters.AddWithValue("@Calories", Convert.ToDouble(txtCalories.Text.Trim()));
+                    cmd.Parameters.AddWithValue("@Protein", string.IsNullOrEmpty(txtProtein.Text) ? 0 : Convert.ToDouble(txtProtein.Text.Trim()));
+                    cmd.Parameters.AddWithValue("@Carbs", string.IsNullOrEmpty(txtCarbs.Text) ? 0 : Convert.ToDouble(txtCarbs.Text.Trim()));
+                    cmd.Parameters.AddWithValue("@Fat", string.IsNullOrEmpty(txtFat.Text) ? 0 : Convert.ToDouble(txtFat.Text.Trim()));
+
                     con.Open();
                     cmd.ExecuteNonQuery();
                 }
@@ -55,6 +62,9 @@ namespace Health_up_.Features
 
                 txtProductName.Text = "";
                 txtCalories.Text = "";
+                txtProtein.Text = "";
+                txtCarbs.Text = "";
+                txtFat.Text = "";
 
                 LoadProducts();
             }

@@ -20,11 +20,6 @@ namespace Health_up_.Features
             {
                 Response.Redirect("~/Account/Login.aspx");
             }
-
-            if (!IsPostBack)
-            {
-             
-            }
         }
 
         protected void btnSelectMeal_Click(object sender, EventArgs e)
@@ -45,7 +40,6 @@ namespace Health_up_.Features
 
             LoadMealEntries();
 
-            
             lblMealMessage.Text = $"✅ Wybrano posiłek: {mealType} dnia {mealDate:yyyy-MM-dd}";
             lblMealMessage.CssClass = "text-success font-weight-bold mt-2 d-block";
             lblMealMessage.Visible = true;
@@ -110,17 +104,28 @@ namespace Health_up_.Features
 
                     foreach (var item in data["products"])
                     {
-                        string name = item["product_name"]?.ToString();
-                        string image = item["image_small_url"]?.ToString();
-                        string kcal = item["nutriments"]?["energy-kcal_100g"]?.ToString();
+                        string name = item["product_name_pl"]?.ToString()
+                                   ?? item["product_name"]?.ToString()
+                                   ?? item["generic_name"]?.ToString()
+                                   ?? "Nieznany produkt";
 
-                        if (!string.IsNullOrEmpty(name) && !string.IsNullOrEmpty(kcal))
+                        string image = item["image_small_url"]?.ToString();
+
+                        double kcal = item["nutriments"]?["energy-kcal_100g"] != null ? (double)item["nutriments"]["energy-kcal_100g"] : 0;
+                        double protein = item["nutriments"]?["proteins_100g"] != null ? (double)item["nutriments"]["proteins_100g"] : 0;
+                        double carbs = item["nutriments"]?["carbohydrates_100g"] != null ? (double)item["nutriments"]["carbohydrates_100g"] : 0;
+                        double fat = item["nutriments"]?["fat_100g"] != null ? (double)item["nutriments"]["fat_100g"] : 0;
+
+                        if (!string.IsNullOrEmpty(name))
                         {
                             results.Add(new
                             {
                                 ProductName = name,
                                 ImageUrl = !string.IsNullOrEmpty(image) ? image : "/Assets/images/no-image.png",
-                                Calories = kcal
+                                Calories = kcal,
+                                Protein = protein,
+                                Carbs = carbs,
+                                Fat = fat
                             });
                         }
                     }
@@ -148,7 +153,7 @@ namespace Health_up_.Features
 
             using (SqlConnection con = new SqlConnection(strcon))
             {
-                string sql = "SELECT ProductName, CaloriesPer100g FROM Products WHERE ProductName LIKE @query";
+                string sql = "SELECT ProductID, ProductName, CaloriesPer100g, ProteinPer100g, CarbsPer100g, FatPer100g FROM Products WHERE ProductName LIKE @query";
                 SqlCommand cmd = new SqlCommand(sql, con);
                 cmd.Parameters.AddWithValue("@query", "%" + query + "%");
                 con.Open();
@@ -158,9 +163,13 @@ namespace Health_up_.Features
                 {
                     results.Add(new
                     {
+                        ProductID = reader["ProductID"].ToString(),
                         ProductName = reader["ProductName"].ToString(),
                         ImageUrl = "/Assets/images/no-image.png",
-                        Calories = reader["CaloriesPer100g"].ToString()
+                        Calories = Convert.ToDouble(reader["CaloriesPer100g"]),
+                        Protein = Convert.ToDouble(reader["ProteinPer100g"]),
+                        Carbs = Convert.ToDouble(reader["CarbsPer100g"]),
+                        Fat = Convert.ToDouble(reader["FatPer100g"])
                     });
                 }
             }
@@ -180,10 +189,9 @@ namespace Health_up_.Features
             var btn = (System.Web.UI.WebControls.Button)sender;
             var container = (System.Web.UI.WebControls.RepeaterItem)btn.NamingContainer;
 
-            // Szukamy TextBoxa w aktualnym wierszu
             var txtGrams = (System.Web.UI.WebControls.TextBox)container.FindControl("txtGrams");
 
-            double grams = 100; // domyślnie 100g
+            double grams = 100;
             if (!string.IsNullOrEmpty(txtGrams.Text))
             {
                 double.TryParse(txtGrams.Text, out grams);
@@ -192,25 +200,34 @@ namespace Health_up_.Features
             string[] args = btn.CommandArgument.Split(';');
             string productName = args[0];
             double caloriesPer100g = Convert.ToDouble(args[1]);
+            double proteinPer100g = Convert.ToDouble(args[2]);
+            double carbsPer100g = Convert.ToDouble(args[3]);
+            double fatPer100g = Convert.ToDouble(args[4]);
 
-            // Obliczamy kalorie proporcjonalnie
-            double calories = (grams / 100.0) * caloriesPer100g;
+            double calories = Math.Round((grams / 100.0) * caloriesPer100g, 2);
+            double protein = Math.Round((grams / 100.0) * proteinPer100g, 2);
+            double carbs = Math.Round((grams / 100.0) * carbsPer100g, 2);
+            double fat = Math.Round((grams / 100.0) * fatPer100g, 2);
 
-            SaveMealEntry(productName, calories, grams);
+            SaveMealEntry(productName, grams, calories, protein, fat, carbs);
             LoadMealEntries();
         }
 
-        private void SaveMealEntry(string productName, double calories, double grams)
+        private void SaveMealEntry(string productName, double grams, double calories, double protein, double carbs, double fat)
         {
             using (SqlConnection con = new SqlConnection(strcon))
             {
-                string query = "INSERT INTO MealEntries (MealID, ProductName, Calories, Grams) VALUES (@MealID, @ProductName, @Calories, @Grams)";
+                string query = @"INSERT INTO MealProducts (MealID, ProductName, Grams, Calories, Protein, Carbs, Fat)
+                                 VALUES (@MealID, @ProductName, @Grams, @Calories, @Protein, @Carbs, @Fat)";
                 using (SqlCommand cmd = new SqlCommand(query, con))
                 {
                     cmd.Parameters.AddWithValue("@MealID", Session["SelectedMealID"]);
                     cmd.Parameters.AddWithValue("@ProductName", productName);
-                    cmd.Parameters.AddWithValue("@Calories", calories);
                     cmd.Parameters.AddWithValue("@Grams", grams);
+                    cmd.Parameters.AddWithValue("@Calories", calories);
+                    cmd.Parameters.AddWithValue("@Protein", protein);
+                    cmd.Parameters.AddWithValue("@Carbs", carbs);
+                    cmd.Parameters.AddWithValue("@Fat", fat);
                     con.Open();
                     cmd.ExecuteNonQuery();
                 }
@@ -223,7 +240,10 @@ namespace Health_up_.Features
 
             using (SqlConnection con = new SqlConnection(strcon))
             {
-                string query = "SELECT ProductName, Grams, Calories FROM MealEntries WHERE MealID=@MealID ORDER BY EntryID DESC";
+                string query = @"SELECT MealProductID, ProductName, Grams, Calories, Protein, Carbs, Fat 
+                         FROM MealProducts 
+                         WHERE MealID=@MealID 
+                         ORDER BY MealProductID DESC";
                 using (SqlCommand cmd = new SqlCommand(query, con))
                 {
                     cmd.Parameters.AddWithValue("@MealID", Session["SelectedMealID"]);
@@ -234,6 +254,31 @@ namespace Health_up_.Features
                         gvMeals.DataSource = dt;
                         gvMeals.DataBind();
                     }
+                }
+            }
+        }
+        protected void gvMeals_RowCommand(object sender, System.Web.UI.WebControls.GridViewCommandEventArgs e)
+        {
+            if (e.CommandName == "DeleteMealProduct")
+            {
+                int rowIndex = Convert.ToInt32(e.CommandArgument);
+                int mealProductId = Convert.ToInt32(gvMeals.DataKeys[rowIndex].Value);
+
+                DeleteMealProduct(mealProductId);
+                LoadMealEntries();
+            }
+        }
+
+        private void DeleteMealProduct(int mealProductId)
+        {
+            using (SqlConnection con = new SqlConnection(strcon))
+            {
+                string query = "DELETE FROM MealProducts WHERE MealProductID=@MealProductID";
+                using (SqlCommand cmd = new SqlCommand(query, con))
+                {
+                    cmd.Parameters.AddWithValue("@MealProductID", mealProductId);
+                    con.Open();
+                    cmd.ExecuteNonQuery();
                 }
             }
         }

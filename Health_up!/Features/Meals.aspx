@@ -1,75 +1,91 @@
-﻿<%@ Page Title="Posiłki" Language="C#" MasterPageFile="~/Site.master"
-    AutoEventWireup="true" CodeBehind="Meals.aspx.cs"
-    Inherits="Health_up_.Features.Meals" Async="true" %>
+﻿<%@ Page Async="true" Title="Posiłki" Language="C#" MasterPageFile="~/Site.master" AutoEventWireup="true" CodeBehind="Meals.aspx.cs" Inherits="Health_up_.Features.Meals" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="MainContent" runat="server">
-    <div class="container mt-5">
-        <h2 class="text-center"><i class="fas fa-utensils"></i> Twoje posiłki</h2>
-        <p class="text-center text-muted">Wybierz dzień i rodzaj posiłku, a następnie dodaj produkty.</p>
+    <div class="container mt-4">
+        <h2>Twoje posiłki</h2>
 
-        <!-- Wybór dnia i posiłku -->
-        <div class="card p-4 mb-4">
-    <h4>Wybierz dzień i posiłek</h4>
-    <div class="form-group">
-        <label>Data:</label>
-        <asp:TextBox ID="txtMealDate" runat="server" CssClass="form-control" TextMode="Date" />
-    </div>
-    <div class="form-group">
-        <label>Rodzaj posiłku:</label>
-        <asp:DropDownList ID="ddlMealType" runat="server" CssClass="form-control">
-            <asp:ListItem Text="Śniadanie" Value="Śniadanie"></asp:ListItem>
-            <asp:ListItem Text="Obiad" Value="Obiad"></asp:ListItem>
-            <asp:ListItem Text="Kolacja" Value="Kolacja"></asp:ListItem>
-            <asp:ListItem Text="Przekąska" Value="Przekąska"></asp:ListItem>
-        </asp:DropDownList>
-    </div>
-    <asp:Button ID="btnSelectMeal" runat="server" Text="Wybierz posiłek" CssClass="btn btn-primary" OnClick="btnSelectMeal_Click" />
+        <!-- wybór daty i rodzaju posiłku -->
+        <div class="form-group">
+            <label for="txtMealDate">Data:</label>
+            <asp:TextBox ID="txtMealDate" runat="server" CssClass="form-control" TextMode="Date"></asp:TextBox>
+        </div>
+        <div class="form-group">
+            <label for="ddlMealType">Rodzaj posiłku:</label>
+            <asp:DropDownList ID="ddlMealType" runat="server" CssClass="form-control">
+                <asp:ListItem Text="Śniadanie" Value="Śniadanie"></asp:ListItem>
+                <asp:ListItem Text="Obiad" Value="Obiad"></asp:ListItem>
+                <asp:ListItem Text="Kolacja" Value="Kolacja"></asp:ListItem>
+                <asp:ListItem Text="Przekąska" Value="Przekąska"></asp:ListItem>
+            </asp:DropDownList>
+        </div>
+        <asp:Button ID="btnSelectMeal" runat="server" Text="Wybierz" CssClass="btn btn-primary" OnClick="btnSelectMeal_Click" />
+        <asp:Label ID="lblMealMessage" runat="server" Visible="false"></asp:Label>
 
-    <!-- Komunikat -->
-    <asp:Label ID="lblMealMessage" runat="server" CssClass="mt-3 d-block font-weight-bold" Visible="false"></asp:Label>
-</div>
+        <hr />
 
-        <!-- Wyszukiwarka -->
-        <div class="card p-4 mb-4">
-            <h4>Wyszukaj produkt</h4>
-            <div class="input-group">
-                <asp:TextBox ID="txtSearchProduct" runat="server" CssClass="form-control" placeholder="Wpisz nazwę produktu..." />
-                <div class="input-group-append">
-                    <asp:Button ID="btnSearchProduct" runat="server" Text="Szukaj" CssClass="btn btn-primary" OnClick="btnSearchProduct_Click" />
-                </div>
-            </div>
+        <!-- wyszukiwanie produktów -->
+        <div class="form-group mt-3">
+            <label for="txtSearchProduct">Wyszukaj produkt:</label>
+            <asp:TextBox ID="txtSearchProduct" runat="server" CssClass="form-control"></asp:TextBox>
+            <asp:Button ID="btnSearchProduct" runat="server" Text="Szukaj" CssClass="btn btn-success mt-2" OnClick="btnSearchProduct_Click" />
         </div>
 
-        <!-- Wyniki wyszukiwania -->
-       <asp:Repeater ID="rptSearchResults" runat="server">
+        <!-- wyniki wyszukiwania -->
+        <asp:Repeater ID="rptSearchResults" runat="server">
     <ItemTemplate>
-        <div class="card mb-3 p-3 d-flex flex-row align-items-center">
-            <img src='<%# Eval("ImageUrl") %>' alt="produkt" 
-                 style="width:80px; height:80px; object-fit:cover;" class="mr-3" />
-            <div class="flex-fill">
-                <h5><%# Eval("ProductName") %></h5>
-                <p>Kalorie: <%# Eval("Calories") %> kcal / 100g</p>
-                <asp:TextBox ID="txtGrams" runat="server" CssClass="form-control" 
-                             placeholder="Ilość (g)" Width="100" />
+        <div class="card mb-3" style="max-width: 500px;">
+            <div class="row no-gutters">
+                <div class="col-md-4">
+                    <img src='<%# Eval("ImageUrl") %>' class="card-img" alt="Brak zdjęcia" />
+                </div>
+                <div class="col-md-8">
+                    <div class="card-body">
+                        <h5 class="card-title"><%# Eval("ProductName") %></h5>
+                        <p class="card-text">
+                            <strong>Kalorie:</strong> <%# Eval("Calories") %> kcal / 100g<br />
+                            <strong>Białko:</strong> <%# Eval("Protein") %> g<br />
+                            <strong>Węglowodany:</strong> <%# Eval("Carbs") %> g<br />
+                            <strong>Tłuszcz:</strong> <%# Eval("Fat") %> g
+                        </p>
+
+                        <asp:TextBox ID="txtGrams" runat="server" CssClass="form-control mb-2" placeholder="Ilość gramów"></asp:TextBox>
+                        <asp:Button ID="btnAddMeal" runat="server" Text="Dodaj"
+                            CommandArgument='<%# Eval("ProductName") + ";" + Eval("Calories") + ";" + Eval("Protein") + ";" + Eval("Carbs") + ";" + Eval("Fat") %>'
+                            CssClass="btn btn-success btn-sm"
+                            OnClick="btnAddMeal_Click" />
+                    </div>
+                </div>
             </div>
-            <asp:Button ID="btnAddMeal" runat="server" Text="Dodaj"
-                CssClass="btn btn-success ml-2"
-                CommandArgument='<%# Eval("ProductName") + ";" + Eval("Calories") %>'
-                OnClick="btnAddMeal_Click" />
         </div>
     </ItemTemplate>
 </asp:Repeater>
 
-        <!-- Lista produktów w posiłku -->
-        <div class="card p-4 mt-4">
-            <h4>Produkty w wybranym posiłku</h4>
-            <asp:GridView ID="gvMeals" runat="server" AutoGenerateColumns="False" CssClass="table table-bordered">
-                <Columns>
-                    <asp:BoundField DataField="ProductName" HeaderText="Produkt" />
-                    <asp:BoundField DataField="Grams" HeaderText="Ilość (g)" />
-                    <asp:BoundField DataField="Calories" HeaderText="Kalorie (kcal)" />
-                </Columns>
-            </asp:GridView>
-        </div>
+        <hr />
+
+        <!-- zapisane produkty w posiłku -->
+        <h4>Dodane produkty</h4>
+        <asp:GridView ID="gvMeals" runat="server" AutoGenerateColumns="False" CssClass="table table-striped mt-3"
+              DataKeyNames="MealProductID"
+              OnRowCommand="gvMeals_RowCommand">
+    <Columns>
+        <asp:BoundField DataField="ProductName" HeaderText="Produkt" />
+        <asp:BoundField DataField="Grams" HeaderText="Ilość (g)" />
+        <asp:BoundField DataField="Calories" HeaderText="Kalorie" />
+        <asp:BoundField DataField="Protein" HeaderText="Białko" />
+        <asp:BoundField DataField="Carbs" HeaderText="Węglowodany" />
+        <asp:BoundField DataField="Fat" HeaderText="Tłuszcze" />
+        <asp:TemplateField HeaderText="Akcje">
+    <ItemTemplate>
+        <asp:LinkButton ID="btnDelete" runat="server"
+                        CssClass="btn btn-danger btn-sm"
+                        CommandName="DeleteMealProduct"
+                        CommandArgument='<%# Container.DataItemIndex %>'
+                        ToolTip="Usuń">
+            <i class="fas fa-trash"></i>
+        </asp:LinkButton>
+    </ItemTemplate>
+</asp:TemplateField>
+    </Columns>
+</asp:GridView>
     </div>
 </asp:Content>

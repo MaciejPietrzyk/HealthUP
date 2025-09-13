@@ -33,6 +33,33 @@ namespace Health_up_.Features
         protected global::System.Web.UI.WebControls.TextBox txtCalories;
 
         /// <summary>
+        /// txtProtein control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox txtProtein;
+
+        /// <summary>
+        /// txtCarbs control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox txtCarbs;
+
+        /// <summary>
+        /// txtFat control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox txtFat;
+
+        /// <summary>
         /// btnAddProduct control.
         /// </summary>
         /// <remarks>

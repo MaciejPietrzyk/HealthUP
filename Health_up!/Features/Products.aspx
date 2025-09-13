@@ -16,6 +16,19 @@
                 <label for="txtCalories">Kalorie (kcal / 100g)</label>
                 <asp:TextBox ID="txtCalories" runat="server" CssClass="form-control" />
             </div>
+            <div class="form-group">
+                <label for="txtProtein">Białko (g / 100g):</label>
+                <asp:TextBox ID="txtProtein" runat="server" CssClass="form-control"></asp:TextBox>
+            </div>
+            <div class="form-group">
+                <label for="txtCarbs">Węglowodany (g / 100g):</label>
+                <asp:TextBox ID="txtCarbs" runat="server" CssClass="form-control"></asp:TextBox>
+            </div>
+
+<div class="form-group">
+    <label for="txtFat">Tłuszcz (g / 100g):</label>
+    <asp:TextBox ID="txtFat" runat="server" CssClass="form-control"></asp:TextBox>
+</div>
             <asp:Button ID="btnAddProduct" runat="server" Text="Dodaj produkt" CssClass="btn btn-success mt-2" OnClick="btnAddProduct_Click" />
             <asp:Label ID="lblMessage" runat="server" CssClass="text-success mt-2" Visible="false"></asp:Label>
         </div>
@@ -29,6 +42,9 @@
                     <asp:BoundField DataField="ProductID" HeaderText="ID" ReadOnly="True" />
                     <asp:BoundField DataField="ProductName" HeaderText="Nazwa produktu" />
                     <asp:BoundField DataField="CaloriesPer100g" HeaderText="Kalorie (kcal/100g)" />
+                    <asp:BoundField DataField="ProteinPer100g" HeaderText="Białko (g)" />
+                    <asp:BoundField DataField="CarbsPer100g" HeaderText="Węglowodany (g)" />
+                    <asp:BoundField DataField="FatPer100g" HeaderText="Tłuszcz (g)" />
                     <asp:CommandField ShowDeleteButton="True" DeleteText="Usuń" />
                 </Columns>
             </asp:GridView>
