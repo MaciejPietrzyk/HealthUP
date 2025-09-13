@@ -75,7 +75,7 @@ namespace Health_up_
                 string query = "SELECT FirstName, LastName, Gender, RegionID, CityID FROM Users WHERE UserID = @UserID";
                 using (SqlCommand cmd = new SqlCommand(query, conn))
                 {
-                    cmd.Parameters.AddWithValue("@UserID", Session["UserID"]);
+                    cmd.Parameters.AddWithValue("@UserID", Convert.ToInt32(Session["UserID"]));
                     conn.Open();
                     SqlDataReader reader = cmd.ExecuteReader();
                     if (reader.Read())
@@ -88,7 +88,11 @@ namespace Health_up_
                         {
                             ddlRegion.SelectedValue = reader["RegionID"].ToString();
                             LoadCities();
-                            ddlCity.SelectedValue = reader["CityID"].ToString();
+
+                            if (reader["CityID"] != DBNull.Value)
+                            {
+                                ddlCity.SelectedValue = reader["CityID"].ToString();
+                            }
                         }
                     }
                 }
@@ -113,7 +117,9 @@ namespace Health_up_
                     cmd.Parameters.AddWithValue("@Gender", ddlGender.SelectedValue);
                     cmd.Parameters.AddWithValue("@RegionID", ddlRegion.SelectedValue != "0" ? (object)ddlRegion.SelectedValue : DBNull.Value);
                     cmd.Parameters.AddWithValue("@CityID", ddlCity.SelectedValue != "0" ? (object)ddlCity.SelectedValue : DBNull.Value);
-                    cmd.Parameters.AddWithValue("@UserID", Session["UserID"]);
+
+                    // 🔑 klucz – konwersja na int
+                    cmd.Parameters.AddWithValue("@UserID", Convert.ToInt32(Session["UserID"]));
 
                     conn.Open();
                     cmd.ExecuteNonQuery();

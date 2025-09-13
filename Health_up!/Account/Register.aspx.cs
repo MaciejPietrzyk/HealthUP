@@ -90,28 +90,36 @@ namespace Health_up_
                 using (SqlConnection con = new SqlConnection(strcon))
                 {
                     con.Open();
-                    using (SqlCommand cmd = new SqlCommand("INSERT INTO Users (Username,FirstName,LastName,Email,PasswordHash,Gender,RegionID,CityID,IsBanned) VALUES (@Username,@FirstName,@LastName,@Email,@PasswordHash,@Gender,@RegionID,@CityID,@IsBanned)", con))
+                    using (SqlCommand cmd = new SqlCommand(@"
+        INSERT INTO Users (Username, FirstName, LastName, Email, PasswordHash, Gender, RegionID, CityID, IsBanned)
+        OUTPUT INSERTED.UserID
+        VALUES (@Username, @FirstName, @LastName, @Email, @PasswordHash, @Gender, @RegionID, @CityID, @IsBanned)", con))
                     {
                         cmd.Parameters.AddWithValue("@Username", txtUsername.Text.Trim());
                         cmd.Parameters.AddWithValue("@FirstName", txtFirstName.Text.Trim());
                         cmd.Parameters.AddWithValue("@LastName", txtLastName.Text.Trim());
                         cmd.Parameters.AddWithValue("@Email", txtEmail.Text.Trim());
 
-                        // 🔒 Hashowanie hasła przed zapisaniem do bazy
                         string hashedPassword = ComputeSha256Hash(txtPassword.Text.Trim());
                         cmd.Parameters.AddWithValue("@PasswordHash", hashedPassword);
 
-                        cmd.Parameters.AddWithValue("@Gender", ddlGender.SelectedItem.Value);
-                        cmd.Parameters.AddWithValue("@RegionID", 17);
-                        cmd.Parameters.AddWithValue("@CityID", 81);
+                        cmd.Parameters.AddWithValue("@Gender", ddlGender.SelectedValue);
+                        cmd.Parameters.AddWithValue("@RegionID", 17); // Brak
+                        cmd.Parameters.AddWithValue("@CityID", 81);   // Brak
                         cmd.Parameters.AddWithValue("@IsBanned", 0);
 
-                        cmd.ExecuteNonQuery();
+                        int newUserId = (int)cmd.ExecuteScalar();
+
+                        Session["UserID"] = newUserId;
+                        Session["Username"] = txtUsername.Text.Trim();
+                        Session["FirstName"] = txtFirstName.Text.Trim();
+                        Session["LastName"] = txtLastName.Text.Trim();
+                        Session["Email"] = txtEmail.Text.Trim();
+                        Session["Gender"] = ddlGender.SelectedValue;
                     }
                 }
 
-                Response.Write("<script>alert('Rejestracja przebiegła pomyślnie!');</script>");
-                Response.Redirect("Login.aspx");
+                Response.Redirect("~/Profiles/UserProfile.aspx");
             }
             catch (Exception ex)
             {

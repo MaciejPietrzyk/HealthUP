@@ -68,16 +68,55 @@ namespace Health_up_
 
             try
             {
+                // Parsujemy dane jeszcze raz z formularza
+                double weight = Convert.ToDouble(txtWeight.Text.Replace(",", "."), System.Globalization.CultureInfo.InvariantCulture);
+                double height = Convert.ToDouble(txtHeight.Text.Replace(",", "."), System.Globalization.CultureInfo.InvariantCulture);
+                int age = int.Parse(txtAge.Text);
+                double activityLevel = Convert.ToDouble(ddlActivityLevel.SelectedValue, System.Globalization.CultureInfo.InvariantCulture);
+                int caloricNeeds = Convert.ToInt32(lblCalories.Text);
+
                 using (SqlConnection con = new SqlConnection(strcon))
                 {
                     con.Open();
-                    SqlCommand cmd = new SqlCommand(
-                        "UPDATE Users SET DailyCalories = @CaloricNeeds WHERE UserID = @UserID", con);
 
-                    cmd.Parameters.AddWithValue("@UserID", Session["UserID"]);
-                    cmd.Parameters.AddWithValue("@CaloricNeeds", Convert.ToInt32(lblCalories.Text));
+                    // sprawdź, czy user ma już rekord w UserHealthData
+                    SqlCommand checkCmd = new SqlCommand("SELECT COUNT(*) FROM UserHealthData WHERE UserID=@UserID", con);
+                    checkCmd.Parameters.AddWithValue("@UserID", Session["UserID"]);
+                    int count = Convert.ToInt32(checkCmd.ExecuteScalar());
 
-                    cmd.ExecuteNonQuery();
+                    if (count > 0)
+                    {
+                        // update istniejącego rekordu
+                        SqlCommand updateCmd = new SqlCommand(@"
+                    UPDATE UserHealthData 
+                    SET Weight=@Weight, Height=@Height, Age=@Age, ActivityLevel=@ActivityLevel, CaloricNeeds=@CaloricNeeds 
+                    WHERE UserID=@UserID", con);
+
+                        updateCmd.Parameters.AddWithValue("@UserID", Session["UserID"]);
+                        updateCmd.Parameters.AddWithValue("@Weight", weight);
+                        updateCmd.Parameters.AddWithValue("@Height", height);
+                        updateCmd.Parameters.AddWithValue("@Age", age);
+                        updateCmd.Parameters.AddWithValue("@ActivityLevel", activityLevel);
+                        updateCmd.Parameters.AddWithValue("@CaloricNeeds", caloricNeeds);
+
+                        updateCmd.ExecuteNonQuery();
+                    }
+                    else
+                    {
+                        // insert nowego rekordu
+                        SqlCommand insertCmd = new SqlCommand(@"
+                    INSERT INTO UserHealthData (UserID, Weight, Height, Age, ActivityLevel, CaloricNeeds) 
+                    VALUES (@UserID, @Weight, @Height, @Age, @ActivityLevel, @CaloricNeeds)", con);
+
+                        insertCmd.Parameters.AddWithValue("@UserID", Session["UserID"]);
+                        insertCmd.Parameters.AddWithValue("@Weight", weight);
+                        insertCmd.Parameters.AddWithValue("@Height", height);
+                        insertCmd.Parameters.AddWithValue("@Age", age);
+                        insertCmd.Parameters.AddWithValue("@ActivityLevel", activityLevel);
+                        insertCmd.Parameters.AddWithValue("@CaloricNeeds", caloricNeeds);
+
+                        insertCmd.ExecuteNonQuery();
+                    }
                 }
 
                 // komunikat i powrót do profilu

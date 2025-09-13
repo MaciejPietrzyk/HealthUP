@@ -23,9 +23,9 @@
                     <div class="form-group">
                         <label for="ddlGender"><i class="fas fa-venus-mars"></i> Płeć</label>
                         <asp:DropDownList ID="ddlGender" runat="server" CssClass="form-control">
-                           <asp:ListItem Value="Mężczyzna" Text="Mężczyzna"></asp:ListItem>
+                           <asp:ListItem Value="Mezczyzna" Text="Mężczyzna"></asp:ListItem>
                            <asp:ListItem Value="Kobieta" Text="Kobieta"></asp:ListItem>
-                           <asp:ListItem Value="Inne" Text="Inne"></asp:ListItem>
+                           <asp:ListItem Value="Inne" Text="Inna"></asp:ListItem>
                         </asp:DropDownList>
                     </div>
 
